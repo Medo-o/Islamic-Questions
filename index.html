@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي الأسئلة الدينية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Made By Medo Ashraf</h1>
+        <h2>مرحبا بك في تحدي الأسئلة الدينية</h2>
+        <h4>للمشاركة في مسابقة الأسئلة الدينية اضغط الزر</h4>
+        <button id="start-button">ادخل التحدي</button>
+    </div>
+
+    <div id="quiz-container" class="hidden">
+        <div class="quiz-box">
+            <h2 id="question"></h2>
+            <div id="options"></div>
+            <p id="feedback"></p>
+            <p id="score">نقاطك: <span id="score-value">0</span></p>
+        </div>
+    </div>
+
+    <script>
+const questions = [
+    { question: "ما هي المدينة التي ولد فيها النبي محمد؟", options: ["المدينة", "مكة", "القدس"], answer: 1 }, // مكة
+    { question: "ما هو ثاني أركان الإسلام؟", options: ["الصلاة", "الشهادة", "الزكاة"], answer: 0 }, // الصلاة
+    { question: "من هو النبي الذي أُلقِيَ في النار ولم تحترق؟", options: ["إبراهيم", "نوح", "موسى"], answer: 0 }, // إبراهيم
+    { question: "ما هي الصلاة التي لا ركوع فيها؟", options: ["صلاة الفجر", "صلاة الجنازة", "صلاة العصر"], answer: 1 }, // صلاة الجنازة
+    { question: "ما هو اسم والد النبي محمد؟", options: ["عبد الله", "عبد المطلب", "أبو طالب"], answer: 0 }, // عبد الله
+    { question: "ما هو اسم سورة التي تتحدث عن الفيل؟", options: ["الفيل", "البقرة", "الكهف"], answer: 0 }, // الفيل
+    { question: "ما هو عدد ركعات صلاة المغرب؟", options: ["3", "4", "2"], answer: 0 }, // 3
+    { question: "من هو الذي لقب بـ 'الفاروق'؟", options: ["أبو بكر", "عمر", "عثمان"], answer: 1 }, // عمر
+    { question: "ما هو اسم أول مسلم أسلم من الرجال؟", options: ["أبو بكر", "علي", "حمزة"], answer: 0 }, // أبو بكر
+    { question: "ما هو اليوم الذي يُعتقد أنه يوم القيامة؟", options: ["يوم الجمعة", "يوم السبت", "يوم الأحد"], answer: 0 }, // يوم الجمعة (يوم القيامة)
+    { question: "ما هي السورة التي تبدأ بالحمد لله؟", options: ["الفاتحة", "المدثر", "البقرة"], answer: 0 }, // الفاتحة
+    { question: "كم عدد ركعات صلاة الظهر؟", options: ["4", "5", "3"], answer: 0 }, // 4
+    { question: "ما هي المدينة التي أُسست بعد الهجرة؟", options: ["مكة", "المدينة", "بدر"], answer: 1 }, // المدينة
+    { question: "من هو النبي الذي أُعطي التوراة؟", options: ["عيسى", "موسى", "محمد"], answer: 1 }, // موسى
+    { question: "ما هي الزكاة المفروضة على المال؟", options: ["2.5%", "5%", "10%"], answer: 0 }, // 2.5%
+    { question: "ما هي الأركان الإيمانية في الإسلام؟", options: ["الرسل", "الملائكة", "الكتب"], answer: 1 }, // الملائكة
+    { question: "ما هو اسم المسجد الأقصى؟", options: ["المسجد الحرام", "المسجد النبوي", "المسجد الأقصى"], answer: 2 }, // المسجد الأقصى
+    { question: "ما هي أشهر غزوة في الإسلام؟", options: ["غزوة أحد", "غزوة بدر", "غزوة خيبر"], answer: 1 }, // غزوة بدر
+    { question: "من هو الصحابي الذي استشهد في غزوة بدر؟", options: ["حمزة", "علي", "أبو بكر"], answer: 0 }, // حمزة
+    { question: "كم عدد الأيام التي صامها النبي محمد في رمضان؟", options: ["29", "30", "31"], answer: 1 } // 30
+];
+
+
+        let score = 0;
+        let currentQuestionIndex = 0;
+        let answered = false;
+
+        document.getElementById("start-button").addEventListener("click", startQuiz);
+
+        function startQuiz() {
+            document.querySelector(".container").classList.add("hidden");
+            document.getElementById("quiz-container").classList.remove("hidden");
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = false;
+
+            // خلط الأسئلة
+            shuffleArray(questions);
+
+            showQuestion();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").textContent = currentQuestion.question;
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.addEventListener("click", () => selectAnswer(index));
+                optionsDiv.appendChild(button);
+            });
+
+            document.getElementById("feedback").textContent = '';
+            answered = false;
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return; // تأكد من أن الزر يمكن الضغط عليه مرة واحدة فقط
+
+            const currentQuestion = questions[currentQuestionIndex];
+            if (selectedIndex === currentQuestion.answer) {
+                score++;
+                document.getElementById("feedback").textContent = 'إجابتك صحيحة حصلت على نقطة واحدة';
+            } else {
+                score--;
+                document.getElementById("feedback").textContent = 'إجابتك خاطئة!';
+            }
+
+            document.getElementById("score-value").textContent = score;
+            currentQuestionIndex++;
+            answered = true;
+
+            // عرض السؤال التالي مباشرة بعد الإجابة
+            if (currentQuestionIndex < questions.length) {
+                setTimeout(showQuestion, 2000); // عرض السؤال التالي بعد 2 ثانية
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById("quiz-container").innerHTML = `<h2>انتهى التحدي!</h2><p>نقاطك النهائية: ${score}</p>`;
+        }
+    </script>
+</body>
+</html>
